@@ -7,14 +7,9 @@ from datetime import datetime
 
 conv_name = sys.argv[1]
 other_user = conv_name.split(",")[1]
-conv_dir_root = "./"
+conv_dir_root = "./exports/" # Specify a different root folder here if desired
 conv_dir = conv_dir_root + other_user
-
-# TODO: Look into this - https://www.programiz.com/python-programming/examples/create-nested-directories
-if (not os.path.exists(conv_dir_root)):
-	os.mkdir(conv_dir_root)
-if (not os.path.exists(conv_dir)):
-	os.mkdir(conv_dir)
+os.makedirs(conv_dir)
 
 pg = 1000
 initial_query = json.dumps({
