@@ -3,6 +3,7 @@
 import json
 import sys
 import os
+import platform
 from datetime import datetime
 
 conv_name = sys.argv[1]
@@ -30,7 +31,7 @@ utc_timestamp = str(datetime.utcnow().timestamp())
 date = datetime.now().strftime("%d-%m-%Y")
 json_out = conv_dir + "/" + date + "_" + utc_timestamp + "_out.json"
 log_out = conv_dir + "/" + date + "_" + utc_timestamp + "_conv.log"
-query_dl = []
+attachment_queries = []
 msg_stack = list()
 
 def run_query(q):
@@ -59,7 +60,7 @@ def get_filename(entry):
 		exit(1)
 
 def mk_out_filename(entry):
-		return conv_dir + "/msg_id_" + get_msg_id(entry) + "_" + get_filename(entry)
+	return conv_dir + "/msg_id_" + get_msg_id(entry) + "_" + get_filename(entry)
 
 def outputmsgs():
 	with open(json_out, 'r') as f:
@@ -84,8 +85,19 @@ def outputmsgs():
 		elif ctype == "attachment":
 			file_name = mk_out_filename(entry)
 			out = get_sender(entry) + " sent attachment " + file_name
-			attachment_query = '{"method": "download", "params": {"options": {"channel": {"name": "' + conv_name + '"}, "message_id": ' + mid + ', "output": "' + file_name + '"}}}'
-			query_dl.append((file_name, attachment_query))
+			attachment_query = json.dumps({
+				"method": "download",
+				"params": {
+					"options": {
+						"channel": {
+							"name": conv_name
+						},
+						"message_id": int(mid),
+						"output": file_name
+					}
+				}
+			})
+			attachment_queries.append((file_name, attachment_query))
 		elif ctype == "attachmentuploaded":
 			out = get_sender(entry) + " attachment " + mk_out_filename(entry) + " uploaded"
 		elif ctype == "edit":
@@ -129,8 +141,10 @@ with open(log_out, 'a') as outfile:
 
 print("downloading attachments...")
 
-for (f, q) in query_dl:
-	# TODO: Unbreak this error - "The system cannot find the path specified."
-	print("downloading " + f)
-	cmd = "echo {} | keybase chat api > /dev/null".format(q)
+null_dir = "NUL" if platform.system() == "Windows" else "/dev/null"
+for (file_name, attachment_query) in attachment_queries:
+	print("downloading " + file_name)
+	cmd = "echo {} | keybase chat api > {}".format(attachment_query, null_dir)
 	os.system(cmd)
+
+print("done")
