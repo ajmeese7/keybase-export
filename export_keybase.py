@@ -9,7 +9,7 @@ conv_name = sys.argv[1]
 other_user = conv_name.split(",")[1]
 conv_dir_root = "./exports/" # Specify a different root folder here if desired
 conv_dir = conv_dir_root + other_user
-os.makedirs(conv_dir)
+os.makedirs(conv_dir, exist_ok=True)
 
 pg = 1000
 initial_query = json.dumps({
