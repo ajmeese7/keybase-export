@@ -26,8 +26,10 @@ initial_query = json.dumps({
 	}
 })
 
-json_out = conv_dir + "/out.json"
-log_out = conv_dir + "/conv.log"
+utc_timestamp = str(datetime.utcnow().timestamp())
+date = datetime.now().strftime("%d-%m-%Y")
+json_out = conv_dir + "/" + date + "_" + utc_timestamp + "_out.json"
+log_out = conv_dir + "/" + date + "_" + utc_timestamp + "_conv.log"
 query_dl = []
 msg_stack = list()
 
