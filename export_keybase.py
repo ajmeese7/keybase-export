@@ -6,6 +6,10 @@ import os
 import platform
 from datetime import datetime
 
+if len(sys.argv) < 2:
+	print("Usage: " + sys.argv[0] + " <conversation name>")
+	exit(1)
+
 conv_name = sys.argv[1]
 other_user = conv_name.split(",")[1]
 conv_dir_root = "./exports/" # Specify a different root folder here if desired
