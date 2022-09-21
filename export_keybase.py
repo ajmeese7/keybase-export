@@ -11,9 +11,11 @@ if len(sys.argv) < 2:
 	exit(1)
 
 conv_name = sys.argv[1]
-other_user = conv_name.split(",")[1]
-conv_dir_root = "./exports/" # Specify a different root folder here if desired
-conv_dir = conv_dir_root + other_user
+output_dir = conv_name.split(",")[1]
+
+# Specify a different root folder here if desired
+conv_dir_root = os.path.normpath("./exports")
+conv_dir = os.path.join(conv_dir_root, output_dir)
 os.makedirs(conv_dir, exist_ok=True)
 
 pg = 1000
@@ -33,8 +35,8 @@ initial_query = json.dumps({
 
 utc_timestamp = str(datetime.utcnow().timestamp())
 date = datetime.now().strftime("%d-%m-%Y")
-json_out = conv_dir + "/" + date + "_" + utc_timestamp + "_out.json"
-log_out = conv_dir + "/" + date + "_" + utc_timestamp + "_conv.log"
+json_out = os.path.join(conv_dir, date + "_" + utc_timestamp + "_out.json")
+log_out = os.path.join(conv_dir, date + "_" + utc_timestamp + "_conv.log")
 attachment_queries = []
 msg_stack = list()
 
@@ -64,7 +66,7 @@ def get_filename(entry):
 		exit(1)
 
 def mk_out_filename(entry):
-	return conv_dir + "/msg_id_" + get_msg_id(entry) + "_" + get_filename(entry)
+	return os.path.join(conv_dir, "msg_id_" + get_msg_id(entry) + "_" + get_filename(entry))
 
 def outputmsgs():
 	with open(json_out, "r") as f:
