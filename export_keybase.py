@@ -126,6 +126,8 @@ def outputmsgs():
 			out = get_sender(entry) + " sent unfurl: " + str(content["unfurl"]["unfurl"]["url"])
 		elif ctype == "metadata":
 			out = get_sender(entry) + " sent metadata: " + str(content["metadata"])
+		elif ctype == "system":
+			out = get_sender(entry) + " sent system message: " + str(content["system"])
 		else:
 			out = "(unknown message type '" + ctype + "')"
 		msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime("%Y-%m-%d %H:%M:%S") + " - " + out + "\n")
