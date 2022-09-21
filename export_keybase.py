@@ -72,6 +72,10 @@ def outputmsgs():
 	with open(json_out, "r") as f:
 		outputmsgs.json_data = json.load(f)
 
+	if "error" in outputmsgs.json_data:
+		print("Error: " + outputmsgs.json_data["error"]["message"])
+		exit(1)
+
 	output_messages = filter(
 		# Filters out all the errored messages, most commonly messages that have since exploded
 		lambda x: not x.__contains__("error"),
