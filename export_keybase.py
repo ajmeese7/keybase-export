@@ -11,7 +11,7 @@ if len(sys.argv) < 2:
 	exit(1)
 
 conv_name = sys.argv[1]
-output_dir = conv_name.split(",")[1]
+output_dir = conv_name.split(",")[1] if "," in conv_name else conv_name
 
 # Specify a different root folder here if desired
 conv_dir_root = os.path.normpath("./exports")
@@ -33,6 +33,13 @@ initial_query = json.dumps({
 	}
 })
 
+# Team chats have a different API format
+if not "," in conv_name:
+	initial_query = json.loads(initial_query)
+	initial_query["params"]["options"]["channel"]["name"] = conv_name
+	initial_query["params"]["options"]["channel"]["members_type"] = "team"
+	initial_query = json.dumps(initial_query)
+
 utc_timestamp = str(datetime.utcnow().timestamp())
 date = datetime.now().strftime("%d-%m-%Y")
 json_out = os.path.join(conv_dir, date + "_" + utc_timestamp + "_out.json")
@@ -41,7 +48,7 @@ attachment_queries = []
 msg_stack = list()
 
 def run_query(q):
-	cmd = "echo {} | keybase chat api > {}".format(q, json_out)
+	cmd = "echo '{}' | keybase chat api > {}".format(q, json_out)
 	os.system(cmd)
 
 run_query(initial_query)
