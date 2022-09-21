@@ -9,4 +9,8 @@ Simply clone this repo with `git clone https://github.com/ajmeese7/keybase-expor
 ## Usage
 1. Ensure that you have Python 3 installed
 2. Ensure that you have the [keybase](https://keybase.io/) CLI installed
-3. `py ./export_keybase.py yourusername,theirusername`
+3. `python ./export_keybase.py [params]`
+
+Accepted parameter inputs include:
+- Two usernames (`yourusername,theirusername`)
+- Team names (`orgname.team`)

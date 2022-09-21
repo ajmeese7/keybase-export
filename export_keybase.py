@@ -6,10 +6,16 @@ import os
 import platform
 from datetime import datetime
 
+if len(sys.argv) < 2:
+	print("Usage: " + sys.argv[0] + " <conversation name>")
+	exit(1)
+
 conv_name = sys.argv[1]
-other_user = conv_name.split(",")[1]
-conv_dir_root = "./exports/" # Specify a different root folder here if desired
-conv_dir = conv_dir_root + other_user
+output_dir = conv_name.split(",")[1] if "," in conv_name else conv_name
+
+# Specify a different root folder here if desired
+conv_dir_root = os.path.normpath("./exports")
+conv_dir = os.path.join(conv_dir_root, output_dir)
 os.makedirs(conv_dir, exist_ok=True)
 
 pg = 1000
@@ -27,15 +33,22 @@ initial_query = json.dumps({
 	}
 })
 
+# Team chats have a different API format
+if not "," in conv_name:
+	initial_query = json.loads(initial_query)
+	initial_query["params"]["options"]["channel"]["name"] = conv_name
+	initial_query["params"]["options"]["channel"]["members_type"] = "team"
+	initial_query = json.dumps(initial_query)
+
 utc_timestamp = str(datetime.utcnow().timestamp())
 date = datetime.now().strftime("%d-%m-%Y")
-json_out = conv_dir + "/" + date + "_" + utc_timestamp + "_out.json"
-log_out = conv_dir + "/" + date + "_" + utc_timestamp + "_conv.log"
+json_out = os.path.join(conv_dir, date + "_" + utc_timestamp + "_out.json")
+log_out = os.path.join(conv_dir, date + "_" + utc_timestamp + "_conv.log")
 attachment_queries = []
 msg_stack = list()
 
 def run_query(q):
-	cmd = "echo {} | keybase chat api > {}".format(q, json_out)
+	cmd = "echo '{}' | keybase chat api > {}".format(q, json_out)
 	os.system(cmd)
 
 run_query(initial_query)
@@ -60,11 +73,15 @@ def get_filename(entry):
 		exit(1)
 
 def mk_out_filename(entry):
-	return conv_dir + "/msg_id_" + get_msg_id(entry) + "_" + get_filename(entry)
+	return os.path.join(conv_dir, "msg_id_" + get_msg_id(entry) + "_" + get_filename(entry))
 
 def outputmsgs():
-	with open(json_out, 'r') as f:
+	with open(json_out, "r") as f:
 		outputmsgs.json_data = json.load(f)
+
+	if "error" in outputmsgs.json_data:
+		print("Error: " + outputmsgs.json_data["error"]["message"])
+		exit(1)
 
 	output_messages = filter(
 		# Filters out all the errored messages, most commonly messages that have since exploded
@@ -109,8 +126,8 @@ def outputmsgs():
 			out = get_sender(entry) + " sent unfurl: " + str(content["unfurl"]["unfurl"]["url"])
 		else:
 			out = "(unknown message type '" + ctype + "')"
-		msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime('%Y-%m-%d %H:%M:%S') + " - " + out + '\n')
-	res = not 'last' in outputmsgs.json_data["result"]["pagination"]
+		msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime("%Y-%m-%d %H:%M:%S") + " - " + out + "\n")
+	res = not "last" in outputmsgs.json_data["result"]["pagination"]
 	if res:
 		outputmsgs.next = outputmsgs.json_data["result"]["pagination"]["next"]
 	return res
@@ -134,7 +151,7 @@ while outputmsgs():
 	})
 	run_query(output_query)
 
-with open(log_out, 'a') as outfile:
+with open(log_out, "a") as outfile:
 	while msg_stack:
 		msg = msg_stack.pop()
 		outfile.write(msg)
