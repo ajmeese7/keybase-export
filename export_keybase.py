@@ -124,6 +124,8 @@ def outputmsgs():
 			out = get_sender(entry) + " deleted message with ids " + str(content["delete"]["messageIDs"])
 		elif ctype == "unfurl":
 			out = get_sender(entry) + " sent unfurl: " + str(content["unfurl"]["unfurl"]["url"])
+		elif ctype == "metadata":
+			out = get_sender(entry) + " sent metadata: " + str(content["metadata"])
 		else:
 			out = "(unknown message type '" + ctype + "')"
 		msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime("%Y-%m-%d %H:%M:%S") + " - " + out + "\n")
