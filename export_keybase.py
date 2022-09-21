@@ -128,9 +128,13 @@ def outputmsgs():
 			out = get_sender(entry) + " sent metadata: " + str(content["metadata"])
 		elif ctype == "system":
 			out = get_sender(entry) + " sent system message: " + str(content["system"])
+		elif ctype == "none":
+			pass
 		else:
 			out = "(unknown message type '" + ctype + "')"
-		msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime("%Y-%m-%d %H:%M:%S") + " - " + out + "\n")
+
+		if out != "":
+			msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime("%Y-%m-%d %H:%M:%S") + " - " + out + "\n")
 	res = not "last" in outputmsgs.json_data["result"]["pagination"]
 	if res:
 		outputmsgs.next = outputmsgs.json_data["result"]["pagination"]["next"]
