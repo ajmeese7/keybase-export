@@ -67,7 +67,7 @@ def mk_out_filename(entry):
 	return conv_dir + "/msg_id_" + get_msg_id(entry) + "_" + get_filename(entry)
 
 def outputmsgs():
-	with open(json_out, 'r') as f:
+	with open(json_out, "r") as f:
 		outputmsgs.json_data = json.load(f)
 
 	output_messages = filter(
@@ -113,8 +113,8 @@ def outputmsgs():
 			out = get_sender(entry) + " sent unfurl: " + str(content["unfurl"]["unfurl"]["url"])
 		else:
 			out = "(unknown message type '" + ctype + "')"
-		msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime('%Y-%m-%d %H:%M:%S') + " - " + out + '\n')
-	res = not 'last' in outputmsgs.json_data["result"]["pagination"]
+		msg_stack.append("#" + mid + " - " + datetime.utcfromtimestamp(sent_at).strftime("%Y-%m-%d %H:%M:%S") + " - " + out + "\n")
+	res = not "last" in outputmsgs.json_data["result"]["pagination"]
 	if res:
 		outputmsgs.next = outputmsgs.json_data["result"]["pagination"]["next"]
 	return res
@@ -138,7 +138,7 @@ while outputmsgs():
 	})
 	run_query(output_query)
 
-with open(log_out, 'a') as outfile:
+with open(log_out, "a") as outfile:
 	while msg_stack:
 		msg = msg_stack.pop()
 		outfile.write(msg)
